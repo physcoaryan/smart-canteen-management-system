@@ -19,3 +19,10 @@ models/*.joblib
 
 # Python environment files
 .env
+
+#and..
+venv/
+__pycache__/
+*.pyc
+.env
+.streamlit/secrets.toml
