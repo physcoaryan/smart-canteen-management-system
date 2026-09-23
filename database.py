@@ -1,7 +1,7 @@
 import os
 
 from dotenv import load_dotenv
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 
 load_dotenv()
 
@@ -16,6 +16,28 @@ db = client["smart_canteen"]
 
 users_collection = db["users"]
 menu_collection = db["menu"]
+orders_collection = db["orders"]
+token_counters_collection = db["token_counters"]
+
+def get_next_token():
+
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    today = datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    ).strftime("%Y-%m-%d")
+
+    counter = token_counters_collection.find_one_and_update(
+        {"date": today},
+        {"$inc": {"number": 1}},
+        upsert=True,
+        return_document=ReturnDocument.AFTER
+    )
+
+    token_number = counter["number"]
+
+    return f"SC-{token_number:03d}"
 
 try:
     client.admin.command("ping")
